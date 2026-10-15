@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Animated, FlatList, Pressable, TextInput, View, useColorScheme } from 'react-native'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import { useThemeTransition } from '../hooks/use-theme-transition'
+import { darkColors, lightColors } from '../theme/colors'
 import { createWeatherScreenStyles } from '../styles/weatherScreen'
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView)
@@ -14,7 +14,25 @@ const dayNames = [
 
 export default function App() {
   const colorScheme = useColorScheme()
-  const colors = useThemeTransition(colorScheme)
+  const target = colorScheme === 'dark' ? 1 : 0
+  const [progress] = useState(() => new Animated.Value(target))
+  useEffect(() => {
+    const animation = Animated.timing(progress, {
+      toValue: target,
+      duration: 2000,
+      useNativeDriver: false,
+    })
+    animation.start()
+    return () => animation.stop()
+  }, [target, progress])
+  const colors = useMemo(() => Object.fromEntries(
+    (Object.keys(lightColors) as (keyof typeof lightColors)[]).map(key => [
+      key, progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [lightColors[key], darkColors[key]],
+      }),
+    ]),
+  ), [progress])
   const styles = useMemo(() => createWeatherScreenStyles(colors), [colors])
   const [city, setCity] = useState('')
   const [shownCity, setShownCity] = useState('Winnipeg')
