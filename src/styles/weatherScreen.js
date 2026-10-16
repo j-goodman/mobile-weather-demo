@@ -26,6 +26,12 @@ export function createWeatherScreenStyles(colors) {
       fontSize: 24,
       color: colors.inputText,
     },
+    buttonRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 8,
+    },
     searchButton: {
       backgroundColor: colors.searchButton,
       borderRadius: 5,
